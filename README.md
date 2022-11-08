@@ -1,4 +1,4 @@
-![](img/noir_logo.jpeg)
+![NoirGame](img/noir_logo.jpeg "Настольная игра «Нуар»")
 
 # noir-game
 NoirGame — проект по реализации онлайн версии настольной игры «Нуар».
