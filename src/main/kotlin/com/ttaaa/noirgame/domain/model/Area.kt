@@ -125,4 +125,48 @@ class Area(
 
         return true
     }
+
+    override fun toString(): String {
+        val mapString = StringBuilder()
+
+        mapString.addHorizontalLine()
+
+        for (row in matrix) {
+            mapString.append("|")
+            for (element in row) {
+                mapString.append(" ")
+                mapString.append(element.card.person.padEnd(STRING_CARD_WIDTH - 1))
+                mapString.append("|")
+            }
+            mapString.append("\n")
+
+            mapString.append("|")
+            for (element in row) {
+                mapString.append(" ")
+                mapString.append(element.type.name.padEnd(STRING_CARD_WIDTH - 1))
+                mapString.append("|")
+            }
+            mapString.append("\n")
+
+            mapString.addHorizontalLine()
+        }
+
+        return """
+            #GameArea: 
+            #   countOfRows     = $cntRows
+            #   countOfColumns  = $cntColumns
+            #Map: 
+            #$mapString       
+        """.trimMargin("#")
+    }
+
+    private fun StringBuilder.addHorizontalLine() {
+        this.append("+")
+        this.append(("-".repeat(STRING_CARD_WIDTH) + "+").repeat( cntColumns))
+        this.append("\n")
+    }
+
+    companion object {
+        private const val STRING_CARD_WIDTH = 16
+    }
 }
