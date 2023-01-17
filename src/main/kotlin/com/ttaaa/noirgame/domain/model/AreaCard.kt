@@ -10,7 +10,7 @@ class AreaCard(
 ) {
     fun killPerson() {
         when (type) {
-            DIED_SUSPECT, CardType.FACE_DOWN_CARD -> throw IllegalArgumentException("Died suspect can't be killed!")
+            DIED_SUSPECT, FACE_DOWN_CARD -> throw IllegalArgumentException("Died suspect can't be killed!")
             SUSPECT, EVIDENCE -> {
                 type = DIED_SUSPECT
             }
@@ -19,8 +19,8 @@ class AreaCard(
 
     fun isAlive(): Boolean {
         return when (type) {
-            DIED_SUSPECT -> false
-            SUSPECT, EVIDENCE, FACE_DOWN_CARD -> true
+            DIED_SUSPECT, FACE_DOWN_CARD -> false
+            SUSPECT, EVIDENCE -> true
         }
     }
 }

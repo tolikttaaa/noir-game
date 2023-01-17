@@ -17,6 +17,10 @@ class Area(
     private val matrix: MutableList<MutableList<AreaCard>>
 ) {
 
+    fun getRowsCount() = cntRows
+
+    fun getColumnsCount() = cntColumns
+
     fun moveRow(rowNumber: Int, direction: HorizontalDirection) {
         if (cntRows < rowNumber || rowNumber < 0) {
             throw IllegalArgumentException("RowNumber must be in this interval [0; $cntRows]")
@@ -26,7 +30,7 @@ class Area(
             LEFT -> {
                 val tmp: AreaCard = matrix[rowNumber][0]
 
-                for (i in 1..cntColumns) {
+                for (i in 1 until cntColumns) {
                     matrix[rowNumber][i - 1] = matrix[rowNumber][i]
                 }
 
@@ -54,7 +58,7 @@ class Area(
             UP -> {
                 val tmp: AreaCard = matrix[0][columnNumber]
 
-                for (i in 1..cntRows) {
+                for (i in 1 until cntRows) {
                     matrix[i - 1][columnNumber] = matrix[i][columnNumber]
                 }
 
@@ -73,6 +77,42 @@ class Area(
         }
     }
 
+    fun collapseRow(collapsedCards: List<Card>) {
+        if (collapsedCards.size != cntColumns) throw IllegalArgumentException("These cards can't be collapsed!")
+
+        for (j in 0 until cntColumns) {
+            if (!(0 until cntRows).map { i -> matrix[i][j] }
+                    .any { areaCard -> areaCard.isAlive() && areaCard.card in collapsedCards })
+                throw IllegalArgumentException("These cards can't be collapsed!")
+        }
+
+        for (i in 0 until cntRows) {
+            for (j in 0 until cntColumns) {
+                if (matrix[i][j].card in collapsedCards) matrix[i].removeAt(j)
+            }
+        }
+
+        cntRows--
+    }
+
+    fun collapseColumn(collapsedCards: List<Card>) {
+        if (collapsedCards.size != cntRows) throw IllegalArgumentException("These cards can't be collapsed!")
+
+        for (i in 0 until cntRows) {
+            if (!(0 until cntColumns).map { j -> matrix[i][j] }
+                    .any { areaCard -> areaCard.isAlive() && areaCard.card in collapsedCards })
+                throw IllegalArgumentException("These cards can't be collapsed!")
+        }
+
+        for (i in 0 until cntRows) {
+            for (j in 0 until cntColumns) {
+                if (matrix[i][j].card in collapsedCards) matrix[i].removeAt(j)
+            }
+        }
+
+        cntColumns--
+    }
+
     fun getKingMoveCards(card: Card): List<Card> {
         val cardCoordinates =
             findCardOnAreaOrNull(card) ?: throw IllegalArgumentException("Card should be on the area!")
@@ -89,6 +129,8 @@ class Area(
     }
 
     fun killPerson(victim: Card, killer: Card) {
+        if (victim == killer) throw IllegalArgumentException("Killer can't kill themself!")
+
         val victimCoordinates =
             findCardOnAreaOrNull(victim) ?: throw IllegalArgumentException("Victim's card should be on the area!")
 
@@ -113,6 +155,9 @@ class Area(
 
         return null
     }
+
+    fun getCards(predicate: (AreaCard) -> Boolean): List<Card> =
+        matrix.flatMap { row -> row.filter(predicate) }.map { it.card }
 
     private fun isKingMove(coordinates1: Pair<Int, Int>, coordinates2: Pair<Int, Int>): Boolean {
         if (abs(coordinates1.first - coordinates2.first) > 1) {
@@ -162,7 +207,7 @@ class Area(
 
     private fun StringBuilder.addHorizontalLine() {
         this.append("+")
-        this.append(("-".repeat(STRING_CARD_WIDTH) + "+").repeat( cntColumns))
+        this.append(("-".repeat(STRING_CARD_WIDTH) + "+").repeat(cntColumns))
         this.append("\n")
     }
 
